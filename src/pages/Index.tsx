@@ -6,6 +6,13 @@ import Sidebar from '@/components/trade/Sidebar';
 import DashboardTab from '@/components/trade/DashboardTab';
 import SanctionsTab from '@/components/trade/SanctionsTab';
 import ForumTab from '@/components/trade/ForumTab';
+import AnalyticsTab from '@/components/trade/AnalyticsTab';
+import CountryTab from '@/components/trade/CountryTab';
+import ProductTab from '@/components/trade/ProductTab';
+import MarketTab from '@/components/trade/MarketTab';
+import CryptoTab from '@/components/trade/CryptoTab';
+import FiatTab from '@/components/trade/FiatTab';
+import OrganizationsTab from '@/components/trade/OrganizationsTab';
 
 const Index = () => {
   const [countries, setCountries] = useState<Country[]>([]);
@@ -201,52 +208,64 @@ const Index = () => {
           )}
 
           {currentTab === 'analytics' && (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>Вкладка "Аналитика" — в разработке</p>
-              <p className="text-sm mt-2">Скоро здесь появятся графики и статистика</p>
-            </div>
+            <AnalyticsTab
+              countries={countries}
+              products={products}
+              sanctions={sanctions}
+            />
           )}
 
           {currentTab === 'country' && (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>Вкладка "Страна" — в разработке</p>
-              <p className="text-sm mt-2">Здесь будет форма регистрации страны</p>
-            </div>
+            <CountryTab
+              countries={countries}
+              setCountries={setCountries}
+            />
           )}
 
           {currentTab === 'product' && (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>Вкладка "Товар" — в разработке</p>
-              <p className="text-sm mt-2">Здесь будет форма добавления товара</p>
-            </div>
+            <ProductTab
+              countries={countries}
+              products={products}
+              setProducts={setProducts}
+            />
           )}
 
           {currentTab === 'market' && (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>Вкладка "Рынок" — в разработке</p>
-              <p className="text-sm mt-2">Здесь будет каталог товаров</p>
-            </div>
+            <MarketTab
+              countries={countries}
+              products={products}
+              setProducts={setProducts}
+              filterType={filterType}
+              setFilterType={setFilterType}
+              filterCountry={filterCountry}
+              setFilterCountry={setFilterCountry}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+            />
           )}
 
           {currentTab === 'crypto' && (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>Вкладка "Криптобиржа" — в разработке</p>
-              <p className="text-sm mt-2">Здесь будет торговля криптовалютами</p>
-            </div>
+            <CryptoTab
+              cryptoCurrencies={cryptoCurrencies}
+              autoRefresh={autoRefresh}
+            />
           )}
 
           {currentTab === 'fiat' && (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>Вкладка "Валюты" — в разработке</p>
-              <p className="text-sm mt-2">Здесь будут курсы валют</p>
-            </div>
+            <FiatTab
+              fiatCurrencies={fiatCurrencies}
+              autoRefresh={autoRefresh}
+            />
           )}
 
           {currentTab === 'organizations' && (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>Вкладка "Организации" — в разработке</p>
-              <p className="text-sm mt-2">Здесь будут ВТО, МВФ и Всемирный банк</p>
-            </div>
+            <OrganizationsTab
+              countries={countries}
+              imfLoans={imfLoans}
+              setImfLoans={setImfLoans}
+              wbProjects={wbProjects}
+              setWbProjects={setWbProjects}
+            />
           )}
         </main>
       </div>
