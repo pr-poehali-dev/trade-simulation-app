@@ -20,6 +20,7 @@ const Index = () => {
   const [sanctions, setSanctions] = useState<Sanction[]>([]);
   const [forumPosts, setForumPosts] = useState<ForumPost[]>([]);
   const [currentTab, setCurrentTab] = useState('dashboard');
+  const [currentCountry, setCurrentCountry] = useState<string>('');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterCountry, setFilterCountry] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('price');
@@ -164,6 +165,9 @@ const Index = () => {
         setNotifications={setNotifications}
         autoRefresh={autoRefresh}
         setAutoRefresh={setAutoRefresh}
+        countries={countries}
+        currentCountry={currentCountry}
+        setCurrentCountry={setCurrentCountry}
       />
 
       <div className="flex">
@@ -235,12 +239,14 @@ const Index = () => {
               countries={countries}
               products={products}
               setProducts={setProducts}
+              setCountries={setCountries}
               filterType={filterType}
               setFilterType={setFilterType}
               filterCountry={filterCountry}
               setFilterCountry={setFilterCountry}
               sortBy={sortBy}
               setSortBy={setSortBy}
+              currentCountry={currentCountry}
             />
           )}
 

@@ -40,10 +40,13 @@ const CountryTab = ({ countries, setCountries }: CountryTabProps) => {
       currency,
       population: population ? parseInt(population) : undefined,
       gdp: gdp ? parseFloat(gdp) : undefined,
-      partners: partners || undefined,
-      description: description || undefined,
+      partners: partners || '',
+      tradeNotes: description || '',
       exports: [],
-      imports: []
+      imports: [],
+      balance: 1000000,
+      totalExported: 0,
+      totalImported: 0
     };
 
     setCountries([...countries, newCountry]);
@@ -182,6 +185,12 @@ const CountryTab = ({ countries, setCountries }: CountryTabProps) => {
                     <CardDescription>Валюта: {country.currency}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Баланс:</span>
+                      <span className="font-bold text-green-600 dark:text-green-400">
+                        ${country.balance.toLocaleString()}
+                      </span>
+                    </div>
                     {country.population && (
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Население:</span>
@@ -194,19 +203,31 @@ const CountryTab = ({ countries, setCountries }: CountryTabProps) => {
                         <span className="font-medium">${country.gdp} млрд</span>
                       </div>
                     )}
+                    <div className="flex justify-between pt-2 border-t">
+                      <span className="text-muted-foreground">Экспортировано:</span>
+                      <span className="font-bold text-blue-600 dark:text-blue-400">
+                        ${country.totalExported.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Импортировано:</span>
+                      <span className="font-bold text-orange-600 dark:text-orange-400">
+                        ${country.totalImported.toLocaleString()}
+                      </span>
+                    </div>
                     {country.partners && (
                       <div className="text-xs text-muted-foreground mt-2 pt-2 border-t">
                         Партнёры: {country.partners}
                       </div>
                     )}
-                    {country.description && (
+                    {country.tradeNotes && (
                       <div className="text-xs text-muted-foreground mt-2 pt-2 border-t">
-                        {country.description}
+                        {country.tradeNotes}
                       </div>
                     )}
                     <div className="flex gap-2 text-xs pt-2 border-t">
                       <div className="flex-1 text-center">
-                        <div className="text-muted-foreground">Экспорт</div>
+                        <div className="text-muted-foreground">Товаров</div>
                         <div className="font-bold text-secondary">{country.exports.length}</div>
                       </div>
                       <div className="flex-1 text-center">

@@ -6,6 +6,9 @@ export interface Country {
   imports: TradeItem[];
   partners: string;
   tradeNotes: string;
+  balance: number;
+  totalExported: number;
+  totalImported: number;
 }
 
 export interface TradeItem {

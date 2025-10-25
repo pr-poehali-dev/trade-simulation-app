@@ -157,10 +157,8 @@ const DashboardTab = ({ countries, products, sanctions, forumPosts, totalTrade, 
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {countries.map(country => {
-                const exportTotal = country.exports.reduce((sum, e) => sum + (e.quantity * e.price), 0);
-                const importTotal = country.imports.reduce((sum, i) => sum + (i.quantity * i.price), 0);
-                const balance = exportTotal - importTotal;
                 const countryHasSanctions = sanctions.some(s => s.fromCountry === country.name || s.toCountry === country.name);
+                const tradeBalance = country.totalExported - country.totalImported;
                 return (
                   <Card key={country.id} className="hover-scale">
                     <CardHeader>
@@ -172,20 +170,30 @@ const DashboardTab = ({ countries, products, sanctions, forumPosts, totalTrade, 
                             <Icon name="AlertTriangle" size={14} className="text-destructive" />
                           )}
                         </span>
-                        <Badge variant={balance > 0 ? "default" : "destructive"}>
-                          {balance > 0 ? '+' : ''}{balance.toFixed(0)} {country.currency}
+                        <Badge variant={tradeBalance >= 0 ? "default" : "destructive"}>
+                          {tradeBalance > 0 ? '+' : ''}{tradeBalance.toLocaleString()} {country.currency}
                         </Badge>
                       </CardTitle>
                       <CardDescription>Валюта: {country.currency}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Экспорт:</span>
-                        <span className="font-medium text-secondary">{exportTotal.toFixed(0)}</span>
+                        <span className="text-muted-foreground">Баланс:</span>
+                        <span className="font-bold text-green-600 dark:text-green-400">
+                          ${country.balance.toLocaleString()}
+                        </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Импорт:</span>
-                        <span className="font-medium text-destructive">{importTotal.toFixed(0)}</span>
+                        <span className="text-muted-foreground">Экспортировано:</span>
+                        <span className="font-medium text-blue-600 dark:text-blue-400">
+                          ${country.totalExported.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Импортировано:</span>
+                        <span className="font-medium text-orange-600 dark:text-orange-400">
+                          ${country.totalImported.toLocaleString()}
+                        </span>
                       </div>
                       {country.partners && (
                         <div className="text-xs text-muted-foreground mt-2 pt-2 border-t">

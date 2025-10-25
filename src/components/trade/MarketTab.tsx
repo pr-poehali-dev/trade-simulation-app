@@ -13,26 +13,31 @@ interface MarketTabProps {
   countries: Country[];
   products: Product[];
   setProducts: (products: Product[]) => void;
+  setCountries: (countries: Country[]) => void;
   filterType: string;
   setFilterType: (type: string) => void;
   filterCountry: string;
   setFilterCountry: (country: string) => void;
   sortBy: string;
   setSortBy: (sort: string) => void;
+  currentCountry: string;
 }
 
 const MarketTab = ({ 
   countries, 
   products, 
-  setProducts, 
+  setProducts,
+  setCountries,
   filterType, 
   setFilterType,
   filterCountry,
   setFilterCountry,
   sortBy,
-  setSortBy
+  setSortBy,
+  currentCountry
 }: MarketTabProps) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [buyQuantity, setBuyQuantity] = useState<{[key: string]: number}>({});
 
   const filteredProducts = products
     .filter(p => {
@@ -50,7 +55,72 @@ const MarketTab = ({
     });
 
   const handleBuyProduct = (product: Product) => {
-    toast.success(`Вы купили ${product.name} за $${product.price}!`);
+    const quantity = buyQuantity[product.id] || 1;
+    
+    if (!currentCountry) {
+      toast.error('Выберите страну покупателя!');
+      return;
+    }
+    
+    if (product.country === currentCountry) {
+      toast.error('Нельзя купить свой собственный товар!');
+      return;
+    }
+    
+    if (quantity > product.quantity) {
+      toast.error('Недостаточно товара на складе!');
+      return;
+    }
+    
+    const buyer = countries.find(c => c.name === currentCountry);
+    const seller = countries.find(c => c.name === product.country);
+    
+    if (!buyer || !seller) {
+      toast.error('Страна не найдена!');
+      return;
+    }
+    
+    const totalCost = product.price * quantity;
+    
+    if (buyer.balance < totalCost) {
+      toast.error(`Недостаточно средств! Нужно $${totalCost.toFixed(2)}, а баланс: $${buyer.balance.toFixed(2)}`);
+      return;
+    }
+    
+    const updatedCountries = countries.map(c => {
+      if (c.name === currentCountry) {
+        return {
+          ...c,
+          balance: c.balance - totalCost,
+          totalImported: c.totalImported + totalCost
+        };
+      }
+      if (c.name === product.country) {
+        return {
+          ...c,
+          balance: c.balance + totalCost,
+          totalExported: c.totalExported + totalCost
+        };
+      }
+      return c;
+    });
+    
+    const updatedProducts = products.map(p => {
+      if (p.id === product.id) {
+        const newQuantity = p.quantity - quantity;
+        if (newQuantity <= 0) {
+          return null;
+        }
+        return { ...p, quantity: newQuantity };
+      }
+      return p;
+    }).filter(Boolean) as Product[];
+    
+    setCountries(updatedCountries);
+    setProducts(updatedProducts);
+    setBuyQuantity({ ...buyQuantity, [product.id]: 1 });
+    
+    toast.success(`Сделка завершена! Куплено ${quantity} шт. ${product.name} за $${totalCost.toFixed(2)}`);
   };
 
   return (
@@ -196,12 +266,6 @@ const MarketTab = ({
                     <span className="text-muted-foreground">В наличии:</span>
                     <span className="font-medium">{product.quantity} шт.</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Общая стоимость:</span>
-                    <span className="font-bold text-secondary">
-                      ${(product.price * product.quantity).toFixed(2)}
-                    </span>
-                  </div>
                 </div>
 
                 {product.description && (
@@ -210,12 +274,30 @@ const MarketTab = ({
                   </p>
                 )}
 
+                <div className="space-y-2">
+                  <Label>Количество для покупки</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max={product.quantity}
+                    value={buyQuantity[product.id] || 1}
+                    onChange={(e) => setBuyQuantity({ ...buyQuantity, [product.id]: Math.max(1, Math.min(product.quantity, parseInt(e.target.value) || 1)) })}
+                  />
+                  <div className="flex justify-between text-sm font-medium">
+                    <span>К оплате:</span>
+                    <span className="text-lg text-primary">
+                      ${(product.price * (buyQuantity[product.id] || 1)).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+
                 <Button 
                   onClick={() => handleBuyProduct(product)} 
                   className="w-full"
+                  disabled={product.country === currentCountry}
                 >
                   <Icon name="ShoppingCart" size={16} className="mr-2" />
-                  Купить
+                  {product.country === currentCountry ? 'Ваш товар' : 'Купить'}
                 </Button>
               </CardContent>
             </Card>
